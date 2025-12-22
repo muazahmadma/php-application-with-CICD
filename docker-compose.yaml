@@ -13,9 +13,7 @@ services:
       - php
 
   php:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: muazkhan098165/php-app:latest
     container_name: php
     environment:
       DB_HOST: ${DB_HOST}
@@ -23,6 +21,8 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - /opt/laravel/env/.env:/var/www/html/php-demo/.env:ro
 
   mariadb:
     image: mariadb:10.6
