@@ -5,7 +5,7 @@ services:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - "${APP_PORT}:80"
+      - "8081:80"
     volumes:
       - .:/var/www/html/php-demo
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -23,18 +23,20 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - /opt/laravel/env/.env:/var/www/html/php-demo/.env:ro
+    depends_on:
+      - mariadb
 
   mariadb:
     image: mariadb:10.6
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
+      - /opt/laravel/env/.env:/var/www/html/php-demo/.env:ro
 
 volumes:
   mariadb_data:
