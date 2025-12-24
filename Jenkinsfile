@@ -18,11 +18,9 @@ pipeline {
         }
         stage("Push to DockerHub"){
             steps{
-                withCredentials([usernamePassword(credentialsId:"dockerhub-creds",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker tag php-app ${env.dockerHubUser}/php-app:latest"
-                    sh "docker push ${env.dockerHubUser}/php-app:latest" 
-                }
+               script{
+                docker_push("dockerhub-creds", "php-app")
+               }
             }
         }
         stage("Deploy"){
