@@ -1,10 +1,14 @@
+@Library("Jenkins_shared_libraries@main") _
+
 pipeline {
     agent { label "dev"};
     
     stages{
         stage("Code"){
             steps{
-                git url: "https://github.com/muazahmadma/php-application-with-CICD.git", branch: "main"
+                scripts{
+                    code_clone("https://github.com/muazahmadma/php-application-with-CICD.git", "main")
+                }
             }
         }
         stage("Build & Test"){
