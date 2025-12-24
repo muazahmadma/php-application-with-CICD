@@ -6,7 +6,7 @@ pipeline {
     stages{
         stage("Code"){
             steps{
-                scripts{
+                script{
                     code_clone("https://github.com/muazahmadma/php-application-with-CICD.git", "main")
                 }
             }
