@@ -1,4 +1,4 @@
-@Library("Jenkins_shared_libraries@main") _
+@Library("Jenkins_shared_libraries") _
 
 pipeline {
     agent { label "Node" }
@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage("Code Checkout") {
             steps {
-                code_clone("https://github.com/muazahmadma/php-application-with-CICD.git", "main")
+                code_clone("https://github.com/alisarfraz13/php-application-with-CICD.git", "main")
             }
         }
         
@@ -43,6 +43,24 @@ pipeline {
                     containerName: "php-app-container"
                 )
             }
+        }
+        
+        stage("Status Check") {
+            steps {
+                statusCheck(imageName: "${IMAGE_NAME}")
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "✅ Pipeline Executed Successfully!"
+        }
+        failure {
+            echo "❌ Pipeline Failed - Check logs"
         }
     }
 }
