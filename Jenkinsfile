@@ -29,11 +29,11 @@ pipeline {
         stage("Push") {
             steps {
                 script{
-                pushDockerImage(
-                    credentialsId: "${DOCKERHUB_CREDS}",
-                    imageName: "${IMAGE_NAME}",
-                    buildTag: "${BUILD_TAG}"
-                )
+                    pushDockerImage(
+                        credentialsId: "${DOCKERHUB_CREDS}",
+                        imageName: "${IMAGE_NAME}",
+                        buildTag: "${BUILD_TAG}"
+                    )
                 }
             }
         }
@@ -41,12 +41,17 @@ pipeline {
         stage("Deploy") {
             steps {
                 script{
-                cleanAndDeploy(
-                    credentialsId: "${DOCKERHUB_CREDS}",
-                    imageName: "${IMAGE_NAME}",
-                    newBuildTag: "${BUILD_TAG}",
-                    containerName: "php-app-container"
-                )
+                    withCredentials([usernamePassword(
+                        credentialsId: "${DOCKERHUB_CREDS}",
+                        usernameVariable: 'DOCKER_USER'
+                    )]) {
+                        cleanAndDeploy(
+                            registryUser: "${DOCKER_USER}",
+                            imageName: "${IMAGE_NAME}",
+                            newBuildTag: "${BUILD_TAG}",
+                            containerName: "php-app-container"
+                        )
+                    }
                 }
             }
         }
@@ -54,8 +59,8 @@ pipeline {
         stage("Status Check") {
             steps {
                 script{
-                statusCheck(imageName: "${IMAGE_NAME}")
-            }
+                    statusCheck(imageName: "${IMAGE_NAME}")
+                }
             }
         }
     }
@@ -65,7 +70,7 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "✅ Pipeline  Executed Successfully!"
+            echo "✅ Pipeline Executed Successfully!"
         }
         failure {
             echo "❌ Pipeline Failed - Check logs"
