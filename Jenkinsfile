@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         IMAGE_NAME      = "php-app"
-        IMAGE_TAG       = "${BUILD_NUMBER}"     // avoid using BUILD_TAG (Jenkins has built-in BUILD_TAG)
+        IMAGE_TAG       = "${BUILD_NUMBER}"
         DOCKERHUB_CREDS = "dockerhubcred"
     }
 
@@ -35,7 +35,7 @@ pipeline {
                     pushDockerImage(
                         credentialsId: env.DOCKERHUB_CREDS,
                         imageName:      env.IMAGE_NAME,
-                        buildTag:       env.IMAGE_TAG   // IMPORTANT: correct key name
+                        buildTag:       env.IMAGE_TAG
                     )
                 }
             }
@@ -64,5 +64,14 @@ pipeline {
     }
 
     post {
-        always { cleanWs() }
-        succes
+        always {
+            cleanWs()
+        }
+        success {
+            echo "✅ Pipeline Executed Successfully!"
+        }
+        failure {
+            echo "❌ Pipeline Failed - Check logs"
+        }
+    }
+}
