@@ -31,7 +31,6 @@ pipeline {
                 script{
                 pushDockerImage(
                     credentialsId: "${DOCKERHUB_CREDS}",
-                    registryUser: "${REGISTRY_USER}",
                     imageName: "${IMAGE_NAME}",
                     buildTag: "${BUILD_TAG}"
                 )
@@ -43,7 +42,6 @@ pipeline {
             steps {
                 script{
                 cleanAndDeploy(
-                    registryUser: "${REGISTRY_USER}",
                     imageName: "${IMAGE_NAME}",
                     newBuildTag: "${BUILD_TAG}",
                     containerName: "php-app-container"
