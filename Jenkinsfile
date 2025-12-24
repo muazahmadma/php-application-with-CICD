@@ -42,6 +42,7 @@ pipeline {
             steps {
                 script{
                 cleanAndDeploy(
+                    credentialsId: "${DOCKERHUB_CREDS}",
                     imageName: "${IMAGE_NAME}",
                     newBuildTag: "${BUILD_TAG}",
                     containerName: "php-app-container"
