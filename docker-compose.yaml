@@ -13,15 +13,12 @@ services:
       - php
 
   php:
-    # Jenkins yahan Dynamic Tag pass karega (e.g., :25)
     image: alisarfraz13/php-app:${IMAGE_TAG} 
     container_name: php-app-container
     restart: always
-    # System Environment Variables load krny ky liye (DB connection etc)
     env_file:
       - /home/ubuntu/project/php-application-with-CICD/.env
     volumes:
-      # Code ko runtime pr .env file deny ky liye
       - /home/ubuntu/project/php-application-with-CICD/.env:/var/www/html/php-demo/.env:ro
     depends_on:
       - mariadb 
@@ -30,17 +27,14 @@ services:
     image: mariadb:10.6
     container_name: mariadb
     restart: always
-    # Database Credentials load krny ky liye
     env_file:
       - /home/ubuntu/project/php-application-with-CICD/.env
     environment:
-      # Variables Map kr rhy hein
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
-      # Data Persistence (Container delete hony pr bhi data safe rahy ga)
       - mariadb_data:/var/lib/mysql
 
 volumes:
