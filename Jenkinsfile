@@ -60,7 +60,7 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "✅ Deployment Complete. App is running on this Build: ${env.IMAGE_TAG}"
+            echo "✅ Deployment Complete. App is running on  Build: ${env.IMAGE_TAG}"
         }
     }
 }
