@@ -4,6 +4,7 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx
+    restart: always
     ports:
       - "8088:80"
     volumes:
@@ -12,15 +13,15 @@ services:
       - php
 
   php:
-    image: alisarfraz13/php-app:latest
+    # ${IMAGE_TAG} Jenkins pass karega (e.g., :20, :21)
+    image: alisarfraz13/php-app:${IMAGE_TAG} 
     container_name: php-app-container
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+    restart: always
+    # System env variables load krny ky liye
+    env_file:
+      - /home/ubuntu/php-application-with-CICD/.env
     volumes:
+      # PHP code ko runtime pr .env file deny ky liye
       - /home/ubuntu/php-application-with-CICD/.env:/var/www/html/php-demo/.env:ro
     depends_on:
       - mariadb 
@@ -29,15 +30,18 @@ services:
     image: mariadb:10.6
     container_name: mariadb
     restart: always
+    # Database credentials load krny ky liye
+    env_file:
+      - /home/ubuntu/php-application-with-CICD/.env
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # MariaDB specific variables ko map kiya
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
+      # Data Persistence: Container delete hony pr bhi data safe rahy ga
       - mariadb_data:/var/lib/mysql
-      - /home/ubuntu/php-application-with-CICD/.env:/var/www/html/php-demo/.env:ro
-
 
 volumes:
   mariadb_data:

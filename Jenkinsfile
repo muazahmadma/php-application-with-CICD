@@ -4,9 +4,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME      = "php-app"
+        APP_NAME        = "php-app"       // Sirf project name
         IMAGE_TAG       = "${BUILD_NUMBER}"
-        DOCKERHUB_CREDS = "dockerhubcred"
+        DOCKERHUB_CREDS = "dockerhubcred" // Jenkins Credential ID
     }
 
     stages {
@@ -18,46 +18,38 @@ pipeline {
             }
         }
 
-        stage("Build") {
+        stage("Build Image") {
             steps {
                 script {
                     buildDockerImage(
-                        imageName: env.IMAGE_NAME,
-                        buildTag:  env.IMAGE_TAG
+                        credentialsId: env.DOCKERHUB_CREDS,
+                        imageName:     env.APP_NAME,
+                        buildTag:      env.IMAGE_TAG
                     )
                 }
             }
         }
 
-        stage("Push") {
+        stage("Push Image") {
             steps {
                 script {
                     pushDockerImage(
                         credentialsId: env.DOCKERHUB_CREDS,
-                        imageName:      env.IMAGE_NAME,
-                        buildTag:       env.IMAGE_TAG
+                        imageName:     env.APP_NAME,
+                        buildTag:      env.IMAGE_TAG
                     )
                 }
             }
         }
 
-        stage("Deploy") {
+        stage("Deploy & Cleanup") {
             steps {
                 script {
                     cleanAndDeploy(
                         credentialsId: env.DOCKERHUB_CREDS,
-                        imageName:      env.IMAGE_NAME,
-                        newBuildTag:    env.IMAGE_TAG,
-                        containerName:  "php-app-container"
+                        imageName:     env.APP_NAME,
+                        newBuildTag:   env.IMAGE_TAG
                     )
-                }
-            }
-        }
-
-        stage("Status Check") {
-            steps {
-                script {
-                    statusCheck(imageName: env.IMAGE_NAME)
                 }
             }
         }
@@ -68,10 +60,7 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "✅ Pipeline Executed Successfully!"
-        }
-        failure {
-            echo "❌ Pipeline Failed - Check logs"
+            echo "✅ Deployment Complete. App is running on Build: ${env.IMAGE_TAG}"
         }
     }
 }
