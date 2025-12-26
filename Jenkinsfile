@@ -5,11 +5,12 @@ pipeline {
 
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook-url')
+        SCANNER_HOME= tool 'sonar-scanner'
     }
 
     stages {
 
-        stage("Code") {
+        stage("Code Clone") {
             steps {
                 script {
                     discord_notify('STARTED')
@@ -18,12 +19,40 @@ pipeline {
             }
         }
 
-        stage("Build & Test") {
+        stage('Trivy FileSystem Scan') {
+            steps {
+                sh "trivy fs --severity HIGH,CRITICAL --exit-code 1 ."
+            }
+        }       
+
+        stage('Sonarqube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=php-app -Dsonar.projectName=php-app"
+                }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage("Build") {
             steps {
                 script{
                     env.VERSION_TAG = "${env.BUILD_NUMBER}"
                     sh "docker build . -t php-app"
                 }
+            }
+        }
+
+        stage("Trivy Image Scan") {
+            steps {
+                sh "trivy image --severity HIGH,CRITICAL --exit-code 1 php-app:latest"
             }
         }
 
