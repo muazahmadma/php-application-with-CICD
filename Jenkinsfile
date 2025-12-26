@@ -38,7 +38,7 @@ pipeline {
         stage("Deploy") {
             steps {
                 sh "docker compose down && docker compose up -d"
-                sh "docker image prune -f"
+                sh "docker image prune -a -f"
             }
         }
     }
