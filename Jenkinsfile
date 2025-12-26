@@ -12,7 +12,7 @@ pipeline {
         stage("Code") {
             steps {
                 script {
-                    discordNotify('STARTED')
+                    discord_notify('STARTED')
                     code_clone("https://github.com/muazahmadma/php-application-with-CICD.git","main")
                 }
             }
