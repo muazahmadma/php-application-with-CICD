@@ -20,14 +20,17 @@ pipeline {
 
         stage("Build & Test") {
             steps {
-                sh "docker build . -t php-app"
+                script{
+                    env.VERSION_TAG = "${env.BUILD_NUMBER}"
+                    sh "docker build . -t php-app"
+                }
             }
         }
 
         stage("Push to DockerHub") {
             steps {
                 script {
-                    docker_push("dockerhub-creds", "php-app")
+                    docker_push("dockerhub-creds", "php-app", env.VERSION_TAG)
                 }
             }
         }
@@ -35,6 +38,7 @@ pipeline {
         stage("Deploy") {
             steps {
                 sh "docker compose down && docker compose up -d"
+                sh "docker image prune -f"
             }
         }
     }
